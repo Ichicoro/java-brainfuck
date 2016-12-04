@@ -19,7 +19,7 @@ public class BrainfuckCPU {
 
     private String srcCode = "";
 
-    private static final int LOG_LEVEL = 1;
+    private static final int LOG_LEVEL = 0;
 
     public BrainfuckCPU() {
         this.setMemsize(10000);
@@ -99,22 +99,29 @@ public class BrainfuckCPU {
 
 
 
-    public void runCode(String code) {
+    private void runCode(String code) {
         for (int i = 0; i < code.length(); i++) {
             if (LOG_LEVEL == 2) {
                 System.out.println(this.machineState());
             }
-            if (this.executeCommand(code.charAt(i)) == 1) {
-                this.runCode(getNextLoop(code, i));
+            int res = this.executeCommand(code.charAt(i));
+            if (inaloop) {
+                this.runCodeSegment(getNextLoop(code, i), res);
                 i = code.indexOf(']', i);
-            }
-            if (this.executeCommand(code.charAt(i)) == 2) {
-                i++;
             }
         }
     }
 
-    public void printPtrByte() {
+    private void runCodeSegment(String code, int res) {
+        while (memory[res] > 0) {
+            for (int i = 0; i < code.length(); i++) {
+                this.executeCommand(code.charAt(i));
+            }
+        }
+        inaloop = false;
+    }
+
+    private void printPtrByte() {
         if (LOG_LEVEL > 0) {
             System.out.print((int) this.getMemory());
         } else {
@@ -122,7 +129,7 @@ public class BrainfuckCPU {
         }
     }
 
-    public int executeCommand(char cmd) {
+    private int executeCommand(char cmd) {
         if (cmd != '[') {
             switch (cmd) {
                 case '>': this.incPointer();
@@ -143,10 +150,12 @@ public class BrainfuckCPU {
                 //case ']': this.setCycleState(-1);
                 //    this.inaloop = false;
                 //    break;
+                case ']': break;
             }
             return 0;
         } else {
-            return 1; // 1=[ 2=]
+            inaloop = true;
+            return this.getPointer(); // 1=[ 2=]
         }
     }
 
