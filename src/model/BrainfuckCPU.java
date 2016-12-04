@@ -23,6 +23,7 @@ public class BrainfuckCPU {
 
     public BrainfuckCPU(int memsize) {
         this.setMemsize(memsize);
+        memory = new char[memsize];
     }
 
     private int setMemsize(int memsize) {
