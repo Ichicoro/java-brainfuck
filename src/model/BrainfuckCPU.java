@@ -19,7 +19,7 @@ public class BrainfuckCPU {
 
     private String srcCode = "";
 
-
+    private static final int LOG_LEVEL = 1;
 
     public BrainfuckCPU() {
         this.setMemsize(10000);
@@ -52,7 +52,7 @@ public class BrainfuckCPU {
         this.pointer = (int) clamp((float) pointer, 0, (float) this.getMemsize());
     }
 
-    public char getMemory() {
+    private char getMemory() {
         return memory[this.getPointer()];
     }
 
@@ -97,31 +97,29 @@ public class BrainfuckCPU {
         return 0;
     }
 
-    /* public void runCode(String code) {
-        for (int i = 0; i < code.length(); i++) {
-            System.out.println(this.machineState());
-            if (!inaloop) {
-                this.executeCommand(code.charAt(i));
-            } else {
-                inaloop = false;
-                this.runCode(getNextLoop(code, i-2));
-                i = code.indexOf(']', i);
-            }
-        }
-    } */
+
 
     public void runCode(String code) {
         for (int i = 0; i < code.length(); i++) {
-            //System.out.println(this.machineState());
+            if (LOG_LEVEL == 2) {
+                System.out.println(this.machineState());
+            }
             if (this.executeCommand(code.charAt(i)) == 1) {
                 this.runCode(getNextLoop(code, i));
-                i = code.indexOf(']', i)+1;
+                i = code.indexOf(']', i);
+            }
+            if (this.executeCommand(code.charAt(i)) == 2) {
+                i++;
             }
         }
     }
 
     public void printPtrByte() {
-        System.out.print((int) this.getMemory());
+        if (LOG_LEVEL > 0) {
+            System.out.print((int) this.getMemory());
+        } else {
+            System.out.print((char) this.getMemory());
+        }
     }
 
     public int executeCommand(char cmd) {
