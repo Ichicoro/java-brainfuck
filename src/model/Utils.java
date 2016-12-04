@@ -8,7 +8,7 @@ public class Utils {
 
 	public static String getNextLoop(String str, int startPos) {
 		str = str.substring(startPos);
-		return str.substring(str.indexOf('['), str.indexOf(']'));
+		return str.substring(str.indexOf('[')+1, str.indexOf(']'));
 	}
 
 }

@@ -19,6 +19,8 @@ public class BrainfuckCPU {
 
     private String srcCode = "";
 
+
+
     public BrainfuckCPU() {
         this.setMemsize(10000);
         memory = new char[this.getMemsize()];
@@ -95,7 +97,7 @@ public class BrainfuckCPU {
         return 0;
     }
 
-    public void runCode(String code) {
+    /* public void runCode(String code) {
         for (int i = 0; i < code.length(); i++) {
             System.out.println(this.machineState());
             if (!inaloop) {
@@ -106,32 +108,47 @@ public class BrainfuckCPU {
                 i = code.indexOf(']', i);
             }
         }
+    } */
+
+    public void runCode(String code) {
+        for (int i = 0; i < code.length(); i++) {
+            //System.out.println(this.machineState());
+            if (this.executeCommand(code.charAt(i)) == 1) {
+                this.runCode(getNextLoop(code, i));
+                i = code.indexOf(']', i)+1;
+            }
+        }
     }
 
     public void printPtrByte() {
-        System.out.print((char) this.getMemory());
+        System.out.print((int) this.getMemory());
     }
 
-    public void executeCommand(char cmd) {
-        switch (cmd) {
-            case '>': this.incPointer();
-                      break;
-            case '<': this.decPointer();
-                      break;
-            case '+': this.incByte();
-                      break;
-            case '-': this.decByte();
-                      break;
-            case '.': this.printPtrByte();
-                      break;
-            case ',': //this.getUserInput();
-                      break;
-            case '[': this.setCycleState(this.getPointer());
-                      this.inaloop = true;
-                      break;
-            case ']': this.setCycleState(-1);
-                      this.inaloop = false;
-                      break;
+    public int executeCommand(char cmd) {
+        if (cmd != '[') {
+            switch (cmd) {
+                case '>': this.incPointer();
+                    break;
+                case '<': this.decPointer();
+                    break;
+                case '+': this.incByte();
+                    break;
+                case '-': this.decByte();
+                    break;
+                case '.': this.printPtrByte();
+                    break;
+                case ',': //this.getUserInput();
+                    break;
+                //case '[': this.setCycleState(this.getPointer());
+                //    this.inaloop = true;
+                //    break;
+                //case ']': this.setCycleState(-1);
+                //    this.inaloop = false;
+                //    break;
+            }
+            return 0;
+        } else {
+            return 1; // 1=[ 2=]
         }
     }
 
@@ -142,7 +159,7 @@ public class BrainfuckCPU {
     private String machineState() {
         String rtn;
         try {
-            rtn = (this.getPointer() + "/" + this.getCycleState() + "/" + (int) this.getMemory() + "/" + this.inaloop);
+            rtn = (this.getPointer() + "/"   /* + this.getCycleState() + "/"*/   + (int) this.getMemory());
         } catch (Exception e) {
             e.printStackTrace();
             rtn = "";
