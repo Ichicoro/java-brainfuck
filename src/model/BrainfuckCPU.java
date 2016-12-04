@@ -17,6 +17,9 @@ public class BrainfuckCPU {
     private int cycleState = -1;
     private boolean inaloop = false;
 
+    private int state = 0; // 0 = idle, -1 = left, +1 = right
+    private int openBrackets = 0;
+
     private String srcCode = "";
 
     private static final int LOG_LEVEL = 0;
@@ -100,25 +103,58 @@ public class BrainfuckCPU {
 
 
     private void runCode(String code) {
-        for (int i = 0; i < code.length(); i++) {
+        int i = 0;
+        while (i < code.length()) {
             if (LOG_LEVEL == 2) {
                 System.out.println(this.machineState());
             }
-            int res = this.executeCommand(code.charAt(i));
-            if (inaloop) {
-                this.runCodeSegment(getNextLoop(code, i), res);
-                i = code.indexOf(']', i);
+            switch (this.state) {
+                case 0:
+                    this.executeCommand(code.charAt(i));
+                    break;
+                case -1:
+                    switch (code.charAt(i)) {
+                        case ']':
+                            this.openBrackets++;
+                            break;
+                        case '[':
+                            if (this.openBrackets > 0)
+                                this.openBrackets--;
+                            else
+                                state = 0;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case +1:
+                    switch (code.charAt(i)) {
+                        case '[':
+                            this.openBrackets++;
+                            break;
+                        case ']':
+                            if (this.openBrackets > 0)
+                                this.openBrackets--;
+                            else
+                                state = 0;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+            }
+            switch (state) {
+                case 0:
+                    i++;
+                    break;
+                case -1:
+                    i--;
+                    break;
+                case +1:
+                    i++;
+                    break;
             }
         }
-    }
-
-    private void runCodeSegment(String code, int res) {
-        while (memory[res] > 0) {
-            for (int i = 0; i < code.length(); i++) {
-                this.executeCommand(code.charAt(i));
-            }
-        }
-        inaloop = false;
     }
 
     private void printPtrByte() {
@@ -129,33 +165,26 @@ public class BrainfuckCPU {
         }
     }
 
-    private int executeCommand(char cmd) {
-        if (cmd != '[') {
-            switch (cmd) {
-                case '>': this.incPointer();
-                    break;
-                case '<': this.decPointer();
-                    break;
-                case '+': this.incByte();
-                    break;
-                case '-': this.decByte();
-                    break;
-                case '.': this.printPtrByte();
-                    break;
-                case ',': //this.getUserInput();
-                    break;
-                //case '[': this.setCycleState(this.getPointer());
-                //    this.inaloop = true;
-                //    break;
-                //case ']': this.setCycleState(-1);
-                //    this.inaloop = false;
-                //    break;
-                case ']': break;
-            }
-            return 0;
-        } else {
-            inaloop = true;
-            return this.getPointer(); // 1=[ 2=]
+    private void executeCommand(char cmd) {
+        switch (cmd) {
+            case '>': this.incPointer();
+                break;
+            case '<': this.decPointer();
+                break;
+            case '+': this.incByte();
+                break;
+            case '-': this.decByte();
+                break;
+            case '.': this.printPtrByte();
+                break;
+            case ',': //this.getUserInput();
+                break;
+            case '[':
+                if (this.getMemory() == 0) state = +1;
+                break;
+            case ']':
+                if (this.getMemory() != 0) state = -1;
+                break;
         }
     }
 
