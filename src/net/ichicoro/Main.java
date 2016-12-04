@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
         cpu = new BrainfuckCPU(10000);
-        cpu.load(helloworld);
+        cpu.load("+++>++>+-<--<---");
 
         cpu.run();
     }

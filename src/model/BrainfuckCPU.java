@@ -19,7 +19,10 @@ public class BrainfuckCPU {
 
     private String srcCode = "";
 
-
+    public BrainfuckCPU() {
+        this.setMemsize(10000);
+        memory = new char[this.getMemsize()];
+    }
 
     public BrainfuckCPU(int memsize) {
         this.setMemsize(memsize);
@@ -96,7 +99,7 @@ public class BrainfuckCPU {
         for (int i = 0; i < code.length(); i++) {
             System.out.println(this.machineState());
             if (!inaloop) {
-                this.executeCommand(code.charAt(this.codePointer));
+                this.executeCommand(code.charAt(i));
             } else {
                 inaloop = false;
                 this.runCode(getNextLoop(code, i-1));
@@ -137,7 +140,14 @@ public class BrainfuckCPU {
     }
 
     private String machineState() {
-        return (this.getPointer() + "/" + this.getCycleState() + "/" + this.getMemory() + "/" + this.inaloop);
+        String rtn;
+        try {
+            rtn = (this.getPointer() + "/" + this.getCycleState() + "/" + this.getMemory() + "/" + this.inaloop);
+        } catch (Exception e) {
+            e.printStackTrace();
+            rtn = "";
+        }
+        return rtn;
     }
 
 
