@@ -86,12 +86,12 @@ public class BrainfuckCPU {
     }
 
     private int incByte() {
-        this.setPointer(this.getPointer() + 1);
+        this.memory[this.getPointer()] = (char) (this.getMemory() + 1);
         return 0;
     }
 
     private int decByte() {
-        this.setPointer(this.getPointer() - 1);
+        this.memory[this.getPointer()] = (char) (this.getMemory() - 1);
         return 0;
     }
 
@@ -102,14 +102,14 @@ public class BrainfuckCPU {
                 this.executeCommand(code.charAt(i));
             } else {
                 inaloop = false;
-                this.runCode(getNextLoop(code, i-1));
+                this.runCode(getNextLoop(code, i-2));
                 i = code.indexOf(']', i);
             }
         }
     }
 
     public void printPtrByte() {
-        System.out.print(this.getMemory());
+        System.out.print((char) this.getMemory());
     }
 
     public void executeCommand(char cmd) {
@@ -142,7 +142,7 @@ public class BrainfuckCPU {
     private String machineState() {
         String rtn;
         try {
-            rtn = (this.getPointer() + "/" + this.getCycleState() + "/" + this.getMemory() + "/" + this.inaloop);
+            rtn = (this.getPointer() + "/" + this.getCycleState() + "/" + (int) this.getMemory() + "/" + this.inaloop);
         } catch (Exception e) {
             e.printStackTrace();
             rtn = "";
